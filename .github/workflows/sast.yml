@@ -11,7 +11,7 @@ jobs:
         id: vars
         shell: bash
         run: |
-          echo "##[set-output name=branch;]$(echo $\{GITHUB_REF#refs/heads/\})"
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
       - name: Prepare Mixeway docker image
@@ -20,4 +20,12 @@ jobs:
 
       - name: Run Scan
         run: |
-          mvn package
+          docker run 
+            -e OSS_USERNAME="aleksandra.0.0.1.1.000@gmail.com" \
+            -e OSS_KEY="e932b39f3751fb4a2b077444f168cc52545800d5" \
+            -e MIXEWAY_URL=https://hub.mixeway.io \
+            -e MIXEWAY_KEY="0ef85720-a5ba-44df-93a7-9de67c9aad7f" \
+            -e MIXEWAY_PROJECT_ID=157 \
+            -v /opt/lab_sec_audit/sast:/opt/sources
+            mixeway/scanner:latest
+
